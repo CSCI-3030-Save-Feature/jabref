@@ -18,29 +18,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A file output stream that is similar to the standard {@link FileOutputStream}, except that all writes are first
- * redirected to a temporary file. When the stream is closed, the temporary file (atomically) replaces the target file.
+ * A file output stream that is similar to the standard {@link FileOutputStream}.
  *
  * <p>
  * In detail, the strategy is to:
  * <ol>
- * <li>Write to a temporary file (with .tmp suffix) in the same directory as the destination file.</li>
  * <li>Create a backup (with .bak suffix) of the original file (if it exists) in the same directory.</li>
- * <li>Move the temporary file to the correct place, overwriting any file that already exists at that location.</li>
+ * <li>Write to the target file</li>
  * <li>Delete the backup file (if configured to do so).</li>
  * </ol>
- * If all goes well, no temporary or backup files will remain on disk after closing the stream.
+ * If all goes well, no backup files will remain on disk after closing the stream.
  * <p>
  * Errors are handled as follows:
  * <ol>
- * <li>If anything goes wrong while writing to the temporary file, the temporary file will be deleted (leaving the
- * original file untouched).</li>
- * <li>If anything goes wrong while copying the temporary file to the target file, the backup of the original file is
- * kept.</li>
+ * <li>If anything goes wrong while writing to the target file, the backup file will replace the original file.</li>
  * </ol>
  * <p>
- * Implementation inspired by code from <a href="https://github.com/martylamb/atomicfileoutputstream/blob/master/src/main/java/com/martiansoftware/io/AtomicFileOutputStream.java">Marty
- * Lamb</a> and <a href="https://github.com/apache/zookeeper/blob/master/src/java/main/org/apache/zookeeper/common/AtomicFileOutputStream.java">Apache</a>.
  */
 public class AtomicFileOutputStream extends FilterOutputStream {
 
@@ -138,7 +131,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     }
 
     /**
-     * Closes the write process to the temporary file but does not commit to the target file.
+     * Closes the write process to the target file.
      */
     public void abort() {
         try {
